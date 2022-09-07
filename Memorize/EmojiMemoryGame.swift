@@ -7,11 +7,7 @@
 
 import SwiftUI
 
-//func makeCardContent(Index: Int) -> String {
-//    return "😅"
-//}
-
-class EmojiMemoryGame {
+class EmojiMemoryGame: ObservableObject {
     
     static let vehicleEmojis = ["🚂", "🚀", "🚁", "🚜", "✈️", "🚗", "🚙", "🏎", "🛵", "🏍", "🚌", "🚐", "🚛", "🛳", "🚑", "🛩", "🛴", "🚲", "🚕", "🚟", "🛺", "🛻", "⛵️", "🚡"]
     static let peopleEmojis = ["👩‍🦽", "🚶", "👨‍🦯", "🏃‍♀️", "🧍", "🤸‍♂️", "⛹️‍♀️", "🤺", "🤾‍♂️", "🏌️‍♀️", "🧘‍♀️"]
@@ -20,16 +16,18 @@ class EmojiMemoryGame {
     static func createMemoryGame() -> MemoryGame<String> {
         MemoryGame<String>(numberOfPairsOfCards: 4) { pairIndex in vehicleEmojis[pairIndex]}
     }
-    
-//    private(set) var model: MemoryGame<String>
-    private var model: MemoryGame<String> = createMemoryGame()
+        
+    @Published private var model: MemoryGame<String> = createMemoryGame()
    
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
     }
     
-    func Foo() -> Array<String> {
-        return EmojiMemoryGame.vehicleEmojis
+    
+    // MARK: - Intent(s)
+    
+    func choose(_ card: MemoryGame<String>.Card) {
+        model.choose(card)
     }
 }

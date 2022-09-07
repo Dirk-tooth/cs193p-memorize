@@ -8,121 +8,87 @@
 import SwiftUI
 
 struct ContentView: View {
-    var vehicleEmojis = ["🚂", "🚀", "🚁", "🚜", "✈️", "🚗", "🚙", "🏎", "🛵", "🏍", "🚌", "🚐", "🚛", "🛳", "🚑", "🛩", "🛴", "🚲", "🚕", "🚟", "🛺", "🛻", "⛵️", "🚡"]
-    var peopleEmojis = ["👩‍🦽", "🚶", "👨‍🦯", "🏃‍♀️", "🧍", "🤸‍♂️", "⛹️‍♀️", "🤺", "🤾‍♂️", "🏌️‍♀️", "🧘‍♀️"]
-    var buildingEmojis = ["🏠", "🏛", "🏯", "🏰", "🏟", "🏥", "🏬", "🏭", "🏦", "🏢",]
-    
-    @State var emojiCount = 10
-    
-    @State var currentTheme: [String] = ["🚂", "🚀", "🚁", "🚜", "✈️", "🚗", "🚙", "🏎", "🛵", "🏍", "🚌", "🚐", "🚛", "🛳", "🚑", "🛩", "🛴", "🚲", "🚕", "🚟", "🛺", "🛻", "⛵️", "🚡"]
-    
-    
+    @ObservedObject var viewModel: EmojiMemoryGame
 
     var body: some View {
-        VStack {
-            Text("Memorize!").font(.largeTitle)
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(currentTheme.shuffled(), id: \.self) {emoji in CardView(content: emoji)}.aspectRatio(2/3, contentMode: .fit)
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                ForEach(viewModel.cards) { card in CardView(card: card)
+                .aspectRatio(2/3, contentMode: .fit)
+                .onTapGesture {
+                    viewModel.choose(card)
                 }
-                .foregroundColor(.red)
             }
-
-            Spacer()
-            
-            HStack{
-//                \/ Old add/remove buttons
-//                remove
-//                Spacer()
-//                add
-                Spacer()
-                vehicles
-                Spacer()
-                people
-                Spacer()
-                buildings
-                Spacer()
-            }
-            .font(.largeTitle)
+            .foregroundColor(.red)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
-    }
-//    \/ Old add/remove buttons
-//    var add: some View {
-//        Button {
-//            if emojiCount < emojis.count {
-//                emojiCount += 1
+
+//            Spacer()
+//
+//            HStack{
+//                Spacer()
+//                vehicles
+//                Spacer()
+//                people
+//                Spacer()
+//                buildings
+//                Spacer()
 //            }
-//        } label: {Image(systemName: "plus.circle")}
+//            .font(.largeTitle)
+        
+    }
+    
+//    var vehicles: some View {
+//        Button {
+//            currentTheme = vehicleEmojis
+//        } label: {
+//            VStack {
+//                Image(systemName: "car")
+//                Text("Vehicles")
+//                    .font(.caption)
+//            }
+//        }
 //    }
 //
-//    var remove: some View {
+//    var people: some View {
 //        Button {
-//            if emojiCount > 1 {
-//                emojiCount -= 1
+//            currentTheme = peopleEmojis
+//        } label: {
+//            VStack {
+//                Image(systemName: "person")
+//                Text("People")
+//                    .font(.caption)
 //            }
-//        } label: {Image(systemName: "minus.circle")}
+//        }
 //    }
-    
-    var vehicles: some View {
-        Button {
-            currentTheme = vehicleEmojis
-        } label: {
-            VStack {
-                Image(systemName: "car")
-                Text("Vehicles")
-                    .font(.caption)
-            }
-        }
-//        .foregroundColor(currentTheme == "vehicles" ? .red : .blue)
-    }
-    
-    var people: some View {
-        Button {
-            currentTheme = peopleEmojis
-        } label: {
-            VStack {
-                Image(systemName: "person")
-                Text("People")
-                    .font(.caption)
-            }
-        }
-//        .foregroundColor(currentTheme == "people" ? .red : .blue)
-    }
-    
-    var buildings: some View {
-        Button {
-            currentTheme = buildingEmojis
-        } label: {
-            VStack {
-                Image(systemName: "house")
-                Text("Buildings")
-                    .font(.caption)
-            }
-        }
-//        .foregroundColor(currentTheme == "buildings" ? .red : .blue)
-    }
+//
+//    var buildings: some View {
+//        Button {
+//            currentTheme = buildingEmojis
+//        } label: {
+//            VStack {
+//                Image(systemName: "house")
+//                Text("Buildings")
+//                    .font(.caption)
+//            }
+//        }
+//    }
     
 }
 
 struct CardView: View {
-    var content: String
-    
-    @State var isFaceUp: Bool = true
+    let card: MemoryGame<String>.Card
     
     var body: some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: 20)
-            if isFaceUp {
+            if card.isFaceUp {
                 shape.fill().foregroundColor(.white)
                 shape.strokeBorder(lineWidth: 3)
-                Text(content).font(.largeTitle)
+                Text(card.content).font(.largeTitle)
             } else {
                 shape.fill()
             }
-        }
-        .onTapGesture {
-            isFaceUp = !isFaceUp
         }
     }
 }
@@ -132,9 +98,11 @@ struct CardView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let game = EmojiMemoryGame()
+        ContentView(viewModel: game)
             .preferredColorScheme(.dark)
-        ContentView()
+        ContentView(viewModel: game)
             
+        }
     }
 }
